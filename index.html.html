@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Тапсырма Генераторы - Педагогикалық Ассистент</title>
+    <!-- Tailwind CSS (Single File) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Интер шрифтін қолдану */
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #e5e7eb; /* Ашық мәтін түсі */
+            /* Жаңа: Қою көкшілден аққа градиент */
+            background-image: linear-gradient(135deg, #102040 0%, #FFFFFF 100%); 
+            background-attachment: fixed; /* Parallax эффектінің кілті */
+            background-size: cover;
+        }
+        /* Негізгі контейнер (Header мен Footer орналасқан) - Қою Көк түс */
+        .container-bg {
+            background-color: #102040; /* Опакті қою көк */
+            backdrop-filter: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Header P мәтінінің түсін реттеу */
+        .text-gray-600 { /* Header P */
+            color: #e5e7eb !important; /* Ашық мәтін */
+        }
+
+        /* Контент блоктары (Форма және Нәтиже) оқылу үшін ақ фонда қалады */
+        .lg\:col-span-1, .lg\:col-span-2 {
+            background-color: #ffffff !important; 
+            color: #1a202c !important; /* Ішіндегі мәтін қара болуы керек */
+        }
+
+        /* Input/Textarea және Label мәтін түсін қара ету */
+        input, textarea, label {
+            color: #1a202c !important; 
+        }
+
+        /* Барлық ішкі тақырыптарды, кесте мәтіндерін қара түске қайтару */
+        .text-gray-700, .text-gray-800, .text-gray-900, .text-blue-800, .text-blue-700 {
+            color: #1a202c !important;
+        }
+
+        /* Секция тақырыптарын (Accent) Бордовый түске реттеу */
+        .section-title {
+            border-left: 4px solid #800020; /* Бордовый түс */
+            padding-left: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: #800020 !important; /* Бордовый түс */
+        }
+
+        /* Ескерту және футтер мәтінін көрінетіндей ету */
+        .text-gray-500 {
+            color: #6b7280 !important; /* Ішкі сұр мәтін (ақ фонда) */
+        }
+        .container-bg .text-sm.text-gray-500 {
+             color: #9ca3af !important; /* Футтер мәтіні (қою көк фонда) */
+        }
+        
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div class="max-w-6xl mx-auto container-bg rounded-2xl p-6 md:p-10">
+
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <!-- text-blue-700 класы text-white болып өзгертілді -->
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-2">Тапсырма генераторы</h1>
+            <!-- Сынып шектеуі алынып тасталды -->
+            <p class="text-lg text-gray-600">Кез келген сынып оқушыларына арналған сыни ойлау тапсырмаларын құрастыру</p>
+        </header>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Input Form (Column 1) -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg h-fit sticky top-8">
+                <h2 class="text-xl font-bold mb-5 text-gray-800 border-b pb-3">Параметрлерді енгізу</h2>
+                <form id="promptForm" onsubmit="generatePrompt(event)">
+                    
+                    <div class="mb-4">
+                        <label for="element" class="block text-sm font-medium text-gray-700">📘 Пән:</label>
+                        <input type="text" id="element" value="Қазақ әдебиеті" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="grade" class="block text-sm font-medium text-gray-700">🎓 Сынып:</label>
+                        <input type="number" id="grade" value="6" required min="1" max="12" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="topic" class="block text-sm font-medium text-gray-700">🧩 Тақырып:</label>
+                        <input type="text" id="topic" value="Абайдың 7-қарасөзі: 'Жан құмары мен тән құмары'" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="goal" class="block text-sm font-medium text-gray-700">🎯 Мақсат (Нені үйреткіңіз келеді?):</label>
+                        <textarea id="goal" rows="4" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500">Оқушылар адамдың бойындағы «жан құмары» мен «тән құмары» ұғымдарын түсініп, еңбектің, үйренудің және білудің маңызын ұғынсын.</textarea>
+                    </div>
+
+                    <button type="submit" id="generateButton" class="w-full py-3 px-4 border border-transparent rounded-lg shadow-md text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+                        Тапсырманы Генерациялау
+                    </button>
+                    
+                </form>
+            </div>
+
+            <!-- Output Display (Columns 2 & 3) -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg min-h-[400px]">
+                <h2 class="text-xl font-bold mb-5 text-gray-800 border-b pb-3">📚 Дайын Оқу Тапсырмасы</h2>
+                
+                <!-- Loading Indicator -->
+                <div id="loading" class="hidden text-center py-10">
+                    <svg class="animate-spin mx-auto h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p class="mt-3 text-gray-600">AI-Педагог тапсырманы ойластыруда...</p>
+                </div>
+
+                <!-- Result Area -->
+                <div id="resultArea" class="space-y-6">
+                    <p class="text-gray-500 text-center py-10">Генерацияны бастау үшін сол жақтағы форманы толтырып, батырманы басыңыз.</p>
+                </div>
+            </div>
+
+        </div>
+        <!-- Құрастырушыны "@AinurJI" деп өзгерту -->
+        <div class="mt-8 pt-4 border-t border-gray-200 text-right text-sm text-gray-500">
+            <p>@AinurJI</p>
+        </div>
+    </div>
+
+    <script type="module">
+        // Глобалды айнымалылар
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+        // Экспоненциалды артқа қайту функциясы
+        const fetchWithRetry = async (url, options, maxRetries = 5) => {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) {
+                        return response;
+                    } else if (response.status === 429 && i < maxRetries - 1) {
+                        const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        continue;
+                    } else {
+                        throw new Error(`API сұрауы қате: ${response.statusText}`);
+                    }
+                } catch (error) {
+                    if (i === maxRetries - 1) throw error;
+                    const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        };
+
+        window.generatePrompt = async (event) => {
+            event.preventDefault();
+
+            const element = document.getElementById('element').value.trim();
+            const grade = document.getElementById('grade').value.trim();
+            const topic = document.getElementById('topic').value.trim();
+            const goal = document.getElementById('goal').value.trim();
+            const resultArea = document.getElementById('resultArea');
+            const loadingIndicator = document.getElementById('loading');
+            const generateButton = document.getElementById('generateButton');
+
+            if (!element || !grade || !topic || !goal) {
+                resultArea.innerHTML = `<p class="text-red-600 font-medium text-center">Барлық өрістерді толтыру қажет!</p>`;
+                return;
+            }
+
+            // UI күйін жаңарту
+            resultArea.innerHTML = '';
+            loadingIndicator.classList.remove('hidden');
+            generateButton.disabled = true;
+            generateButton.textContent = 'Генерациялануда...';
+
+            const userQuery = `Пән: ${element}. Сынып: ${grade}-сынып. Сабақтың тақырыбы: ${topic}. Сабақтың мақсаты (мұғалім не үйреткісі келеді): ${goal}. Осы параметрлерге сәйкес, оқушылардың жас ерекшелігіне сай, сыни және креативті ойлауды дамытатын оқу тапсырмасын құрастыр. Тапсырма Абайдың 7-қарасөзінің үлгісіндегідей құрылымда болсын.`;
+            
+            // JSON схемасы
+            const responseSchema = {
+                type: "OBJECT",
+                properties: {
+                    hook: { type: "STRING", description: "Оқушылардың назарын аударатын қызықты кіріспе немесе сұрақ (Hook)." },
+                    mainTask: { type: "STRING", description: "Негізгі талдау тапсырмасы және шығармашылық жұмыс (6-сынып деңгейіне лайық)." },
+                    evaluationCriteria: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                criterion: { type: "STRING", description: "Критерийдің қысқа атауы" },
+                                description: { type: "STRING", description: "Критерийдің толық сипаттамасы" }
+                            }
+                        },
+                        description: "Бағалауға арналған 3-4 түсінікті критерийлер тізімі."
+                    },
+                    methodologicalAdvice: { type: "STRING", description: "Мұғалімге арналған сабақты өткізу бойынша 2-3 нақты әдістемелік кеңес." },
+                    bloomLevel: { type: "STRING", description: "Блум таксономиясының негізгі деңгейін көрсету (Мысалы: Түсіну, Талдау, Бағалау)." }
+                }
+            };
+            
+            const systemPrompt = `Сен — педагогикалық ассистентсің, әдіскер және әдебиет пәні мұғаліміне көмекшісің. Сенің міндетің - берілген пән, сынып және мақсат негізінде, оқушылардың жас ерекшелігіне сай, сыни ойлау мен креативтілікті дамытатын, Қазақстанның орта мектептерінің стандарттарына сәйкес күрделі оқу тапсырмасын құрастыру. Жауабыңды қатаң түрде қазақ тілінде және берілген JSON форматында ғана бер.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: responseSchema
+                },
+            };
+
+            try {
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                
+                let generatedJson;
+
+                try {
+                    const jsonString = result.candidates[0].content.parts[0].text;
+                    generatedJson = JSON.parse(jsonString);
+                } catch (e) {
+                    throw new Error("AI-дан алынған жауаптың құрылымы қате немесе JSON форматы бұзылған.");
+                }
+
+                // Нәтижені көрсету
+                displayResult(generatedJson, element, grade, topic, goal);
+
+            } catch (error) {
+                console.error("Генерациялау қатесі:", error);
+                resultArea.innerHTML = `<div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg"><p class="font-bold">Қате орын алды:</p><p>${error.message}. Қайталап көріңіз.</p></div>`;
+            } finally {
+                // UI күйін қалпына келтіру
+                loadingIndicator.classList.add('hidden');
+                generateButton.disabled = false;
+                generateButton.textContent = 'Тапсырманы Генерациялау';
+            }
+        };
+
+        function displayResult(data, element, grade, topic, goal) {
+            const resultArea = document.getElementById('resultArea');
+            let htmlContent = `
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded-lg">
+                    <p class="font-bold text-blue-800">📘 Пән: ${element} | 🎓 Сынып: ${grade} | 🧩 Тақырып: ${topic}</p>
+                    <p class="text-blue-700 text-sm mt-1">🎯 Мақсат: ${goal}</p>
+                </div>
+
+                <div class="mb-6 p-4 border-l-4 border-yellow-500 bg-yellow-50 rounded-lg">
+                    <h3 class="section-title text-xl font-bold text-yellow-800">✨ Қызықты Кіріспе (Hook)</h3>
+                    <div class="text-gray-700">${data.hook}</div>
+                </div>
+
+                <div class="mb-6 p-4 border-l-4 border-green-500 bg-green-50 rounded-lg">
+                    <h3 class="section-title text-xl font-bold text-green-800">🧠 Негізгі Тапсырма (Сыни Ойлау)</h3>
+                    <div class="text-gray-700">${data.mainTask}</div>
+                </div>
+
+                <div class="mb-6 p-4 border-l-4 border-purple-500 bg-purple-50 rounded-lg">
+                    <h3 class="section-title text-xl font-bold text-purple-800">📏 Бағалау Критерийлері</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-purple-200">
+                            <thead>
+                                <tr class="bg-purple-100">
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-purple-600 uppercase tracking-wider w-1/3">Критерий</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-purple-600 uppercase tracking-wider w-2/3">Сипаттамасы</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-purple-200">
+                                ${data.evaluationCriteria.map(c => `
+                                    <tr>
+                                        <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">${c.criterion}</td>
+                                        <td class="px-3 py-2 text-sm text-gray-500">${c.description}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mb-6 p-4 border-l-4 border-red-500 bg-red-50 rounded-lg">
+                    <h3 class="section-title text-xl font-bold text-red-800">👩‍🏫 Мұғалімге Әдістемелік Кеңес</h3>
+                    <div class="text-gray-700">${data.methodologicalAdvice}</div>
+                </div>
+
+                <div class="p-4 bg-gray-100 rounded-lg text-center">
+                    <p class="font-bold text-gray-700">📈 Тапсырманың Bloom деңгейі: <span class="text-blue-600">${data.bloomLevel}</span></p>
+                </div>
+            `;
+            resultArea.innerHTML = htmlContent;
+        }
+    </script>
+</body>
+</html>
